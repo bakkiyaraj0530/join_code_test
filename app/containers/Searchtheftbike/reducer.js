@@ -24,10 +24,7 @@ export const initialState = fromJS({
 function searchbikeReducer(state = initialState, action) {
   switch (action.type) {
     case GET_BIKELIST:
-    return state.merge({
-      pageno: action.pageno, showErrorMessage: null,
-    });
-    // return state.set('bikePayload', action.bikePayload);
+      return state.set('payload', action.payload);
   case GET_BIKELISTS_SUCCESS:
     return state.set('bikelistResponse', action.bikeResponse);
     // return state.merge({

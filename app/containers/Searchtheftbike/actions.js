@@ -24,10 +24,10 @@ import { GET_BIKELIST, GET_BIKELISTS_SUCCESS, GET_BIKELISTS_FAIL } from './const
  *
  * @return {object}    An action object with a type of CHANGE_USERNAME
  */
-export function getbikedetails(pageno) {
+export function getbikedetails(payload) {
   return {
     type: GET_BIKELIST,
-    pageno,
+    payload,
   };
 }
 export function getbikedetailsSuccess(bikeResponse) {
