@@ -7,27 +7,28 @@ import { GET_BIKELIST } from './constants';
 import { getbikedetailsSuccess, getbikedetailsFailure } from './actions';
 
 import request from 'utils/request';
-// import { makeSelectBike } from './selectors';
 import { makeSelectPageNo, selectBike } from 'containers/Searchtheftbike/selectors';
 
 /**
  * Github repos request/response handler
  */
-export function* getBikelist() {
-  // Select username from store
-  const pageNo = yield select(makeSelectPageNo()) | 1;
-  // const fromDate = yield select(makeSelectFromDate());
-  // const toDate = yield select(makeSelectTodate());
-  // const requestURL = `https://api.github.com/users/${username}/repos?type=all&sort=updated`;
+export function* getBikelist(action) {
+  let requestURL = `https://bikewise.org:443/api/v2/incidents?page=${action.payload.pageno}&per_page=10&proximity_square=100`;
 
-  const requestURL = `https://bikewise.org:443/api/v2/incidents?page=${pageNo}&per_page=10&proximity_square=100`;
+  //https://bikewise.org:443/api/v2/incidents?page=1&per_page=10&occurred_before=1548423269&occurred_after=1548387272&proximity_square=100&query=Several%20children
+
+  requestURL = (action.payload && action.payload.bikedesc) ? `${requestURL}&query=${action.payload.bikedesc}` : requestURL;
+  requestURL = (action.payload && action.payload.fromdatevalue) ? `${requestURL}&occurred_after=${action.payload.fromdatevalue}` : requestURL;
+  requestURL = (action.payload && action.payload.toDatevalue) ? `${requestURL}&occurred_before=${action.payload.toDatevalue}` : requestURL;
+
+  const finalURL = `https://bikewise.org:443/api/v2/incidents?page=1&per_page=10&proximity_square=100&query=${action.payload.bikedesc}`;
   try {
     // Call our request helper (see 'utils/request')
     const bikeresponse = yield call(request, requestURL);
     // alert('saga inside');
     yield put(getbikedetailsSuccess(bikeresponse['incidents']));
   } catch (err) {
-    yield put(getbikedetailsFailure(err));
+    yield put(getbikedetailsFailure('Failed'));
   }
 }
 

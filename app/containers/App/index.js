@@ -41,7 +41,7 @@ export default function App() {
       <Header />
       <Switch>
         <Route exact path="/" component={HomePage} />
-        <Route path="/features" component={FeaturePage} />
+        {/* <Route path="/features" component={FeaturePage} /> */}
         <Route path="/searchbike" component={Searchthefbike} />
         <Route path="" component={NotFoundPage} />        
       </Switch>

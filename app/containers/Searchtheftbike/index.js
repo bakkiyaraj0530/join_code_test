@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
+// import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { compose, bindActionCreators } from 'redux';
 import styled from 'styled-components';
@@ -16,16 +16,10 @@ import { createStructuredSelector } from 'reselect';
 import Pagination from "react-js-pagination";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+const moment = require('moment');
 
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
-// import {
-//   makeSelectRepos,
-//   makeSelectLoading,
-//   makeSelectError,
-// } from 'containers/App/selectors';
-import H2 from 'components/H2';
-// import ReposList from 'components/ReposList';
 import List from 'components/List';
 // import LoadingIndicator from 'components/LoadingIndicator';
 import RepoListItem from 'containers/RepoListItem';
@@ -37,18 +31,19 @@ import CenteredSection from './CenteredSection';
 import Form from './Form';
 import Input from './Input';
 import Section from './Section';
-import messages from './messages';
+// import messages from './messages';
+import H2 from 'components/H2';
 // import { loadRepos } from '../App/actions';
 // import  { getbikedetails }  from './actions';
 import * as ActionCreators from './actions';
 
-import { makeSelectBike } from './selectors';
+import { makeSelectBike, makeSelectError } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 import LoadingDots from 'components/LoadingDots';
 
 const UpdatingOverlay = styled.div`
-    background: #FFFFFF;
+    background: #E1E5E8;
     opacity:.2;
     z-index:1000;
     text-align:center;
@@ -59,148 +54,163 @@ export class Searchthefbike extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      activePage: 15
-    };
+    this.state = intialState;
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handlefromdateChange = this.handlefromdateChange.bind(this);
+    this.handletodateChange = this.handletodateChange.bind(this);
 
     // this.ReposList = this.ReposList.bind(this);
   }
   handlePageChange(pageNumber) {
-    console.log(`active page is ${pageNumber}`);
-    this.props.actions.getbikedetails(pageNumber);
-    this.setState({activePage: pageNumber});
+    const payload = {
+      pageno: pageNumber
+    }
+    this.props.actions.getbikedetails(payload);
+    this.setState({activePage: pageNumber + 1});
   }
 
   handleChange(event) {
-    const target = event.target;
-    const value = target.type === 'input' ? target.value : '';
-    const name = target.name;
-    // console.log(name, value);
-    this.state = intialState;
-    this.setState({
-      [name]: value
-    });
-    // console.log('handle change', event.target.id.value);
-    // return false;  
-    // this.setState({value: event.target.value});
+    this.setState({value: event.target.value});
   }
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.search);
+    let validate = false;
+    const fromdatevalue = this.formatDate(this.state.fromDate);
+    const toDatevalue = this.formatDate(this.state.toDate);
+    validate = (fromdatevalue < toDatevalue) ? true : false;
+    this.setState({ dateError: validate});
+    const payload = {
+      bikedesc: this.state.value,
+      fromdatevalue,
+      toDatevalue,
+      pageno: 1
+    }
+    this.props.actions.getbikedetails(payload);
     event.preventDefault();
-  // const data = new FormData(event.target);
-  //  console.log(values);
  }
   /**
    * when initial state username is not null, submit the form to load repos
    */
   componentDidMount() {
-    this.props.actions.getbikedetails(1);
+    const payload = {
+      pageno: 1
+    }
+    this.props.actions.getbikedetails(payload);
   }
+  formatDate(date) {
+    const day = date.getDate();
+    const monthIndex = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const final = (monthIndex.length === 1) ? `0${monthIndex}` : monthIndex;
+    const newDate = `${final}/${day}/${year}`;
+    return (new Date(newDate).getTime());
+  }
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.searchbike && nextProps.showerror == null) {
+        prevState.isLoading = false;
+    }
+    if (nextProps.searchbike == null && nextProps.showerror) {
+      prevState.isLoading = false;
+      prevState.error = true;
+    }
+  }
+  
   handletodateChange(date) {
     this.setState({
-      starttoDate: date
+      toDate: date
     });
   }
 
   handlefromdateChange(date) {
     this.setState({
-      startfromDate: date
+      fromDate: date
     });
   }
   
   ReposList = (loading, repos) => {
-    // if (loading) {
-    //   return <List items={repos} component={RepoListItem} />;
-    // }
-  
-    // if (error !== false) {
-    //   const ErrorComponent = () => (
-    //     <ListItem item="Something went wrong, please try again!" />
-    //   );
-    //   return <List component={ErrorComponent} />;
-    // }
-  
     if (repos !== false) {
       return <List items={repos} component={RepoListItem} />;
     }
-  
     return null;
   }
 
   render() {
     const { searchbike, loading } = this.props;
-    //  console.log('searchbike => ', searchbike);
-    const reposListProps = {
-      loading,
-      // error,
-      searchbike,
-    };
+    if (!(this.state.isLoading) && this.state.error) {
+        return (
+        <div className="row">
+        <div className="col-xs-12">
+          <div className="alert alert-danger text-center">Error: Could not retrieve Bike Information at this time.</div>
+        </div>
+      </div>
+      );
+    } 
     if (this.state.isLoading) {
       return (
         <div className="row">
           <div className="col-xs-12">
-            <div className="loading-dots"> <LoadingDots /></div>
-            <UpdatingOverlay></UpdatingOverlay>
+              <UpdatingOverlay>
+              <div className="loading-dots"> <LoadingDots /></div>
+              </UpdatingOverlay>
           </div>
         </div>
       );
     }
+    if (this.state.dateError) { 
+      return (
+        <div className="row">
+          <div className="col-xs-12">
+              <div className="alert alert-danger text-center">Error:  Please select From date much earlier than To date .</div>
+          </div>
+        </div>
+      );
+    }
+    const content = (searchbike.length === 0 ) ? 'NO ITEM FOUND, PLEASE TRY WITH DIFFERENT DATES !!!' : this.ReposList(loading, searchbike);
     return (
       <article>
         <Helmet>
-          <title>Home Page</title>
+          <title>Search Incidence</title>
           <meta
             name="description"
             content="A React.js Boilerplate application homepage"
           />
         </Helmet>
         <div>
-          {/* <CenteredSection>
-            <H2>
-              <FormattedMessage {...messages.startProjectHeader} />
-            </H2>
-            <p>
-              <FormattedMessage {...messages.startProjectMessage} />
-            </p>
-          </CenteredSection> */}
-          <Section>            
-            <Form onSubmit={this.handleSubmit}>
-              
+        <CenteredSection>
+              <H2>
+                Police Department of Berlin
+              </H2>
+        </CenteredSection>
+          <Section> 
+            <Form onSubmit={this.handleSubmit}>              
                 <div className="col-md-6">
-                  <Input name="searchs" type="text" value={this.state.value} placeholder="Search Bike" onChange={this.handleChange} />
+                  <Input name="searchs" type="text" className="input-lg" value={this.state.value} placeholder="Search Bike" onChange={this.handleChange} />
                 </div>
-
-                {/* <Input
-                  id="search"
-                  type="text"
-                  placeholder="Search Bike"
-                  value={this.props.username}
-                  // onChange={this.props.onChangeUsername}
-                /> */}
-              
               <div className="col-md-2 text-control">
-                  {/* <DatePicker
-                    selected={this.state.startfromDate}
+                  <DatePicker
+                    placeholder="From "
+                    selected={this.state.fromDate}
                     onChange={this.handlefromdateChange}
-                    /> */}
-                <Input id="fromdate" type="text" placeholder="From Date"/>
+                    dateFormat="dd/MM/yyyy"
+                    className="form-control"
+                    />
               </div>
               <div className="col-md-2">
-                    {/* <DatePicker
-                      selected={this.state.starttoDate}
-                      onChange={this.handletodateChange}
-                    /> */}
-                  <Input id="todate" type="text" placeholder="To date"/>
+                  <DatePicker
+                    placeholder="To "
+                    selected={this.state.toDate}
+                    onChange={this.handletodateChange}
+                    dateFormat="dd/MM/yyyy"
+                    className="form-control"
+                  />
               </div>
               <div className="col-md-2">      
-                  <button type="submit" value="Submit" >Submit</button>
+                  <button type="submit" value="Submit" className="btn btn-default" >Find Cases</button>
                  {/* <button>Log In </button> */}
               </div>
             </Form>
-              {this.ReposList(loading, searchbike)}
-            {/* <ReposList {...reposListProps} /> */}
+            {content}
           </Section>
           <div>
             <Pagination
@@ -243,12 +253,17 @@ export function mapDispatchToProps(dispatch) {
 
 const intialState = {
   isLoading: true,
+  error: false,
+  activePage: 1,
+  fromDate: new Date(),
+  toDate: new Date(),
+  dateError: false,
 };
 const mapStateToProps = createStructuredSelector({
   // repos: makeSelectRepos(),
   searchbike: makeSelectBike(),
   // loading: makeSelectLoading(),
-  // error: makeSelectError(),
+  showerror: makeSelectError(),
 });
 
 const withConnect = connect(
