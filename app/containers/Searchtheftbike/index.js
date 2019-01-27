@@ -1,5 +1,5 @@
 /*
- * HomePage
+ * Search Case incident page
  *
  * This is the first thing users see of our App, at the '/' route
  */
@@ -16,15 +16,11 @@ import { createStructuredSelector } from 'reselect';
 import Pagination from "react-js-pagination";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-const moment = require('moment');
 
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
 import List from 'components/List';
-// import LoadingIndicator from 'components/LoadingIndicator';
 import RepoListItem from 'containers/RepoListItem';
-
-// import SearchBikeFilter from 'components/SearchBikeFilter';
 
 import AtPrefix from './AtPrefix';
 import CenteredSection from './CenteredSection';
@@ -33,11 +29,9 @@ import Input from './Input';
 import Section from './Section';
 // import messages from './messages';
 import H2 from 'components/H2';
-// import { loadRepos } from '../App/actions';
-// import  { getbikedetails }  from './actions';
 import * as ActionCreators from './actions';
 
-import { makeSelectBike, makeSelectError } from './selectors';
+import { makeSelectBike, makeSelectError, makeSelecttotalCount} from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 import LoadingDots from 'components/LoadingDots';
@@ -74,12 +68,18 @@ export class Searchthefbike extends React.Component {
   handleChange(event) {
     this.setState({value: event.target.value});
   }
+  reset() {
+    location.reload();
+  }
   handleSubmit(event) {
     let validate = false;
     const fromdatevalue = this.formatDate(this.state.fromDate);
     const toDatevalue = this.formatDate(this.state.toDate);
     validate = (fromdatevalue < toDatevalue) ? true : false;
-    this.setState({ dateError: validate});
+    const dateErrord = {
+      dateError: validate
+    }
+    this.state(dateErrord);
     const payload = {
       bikedesc: this.state.value,
       fromdatevalue,
@@ -88,11 +88,14 @@ export class Searchthefbike extends React.Component {
     }
     this.props.actions.getbikedetails(payload);
     event.preventDefault();
+    event.target.reset();
+
  }
   /**
    * when initial state username is not null, submit the form to load repos
    */
   componentDidMount() {
+    this.props.actions.getcaseCount();
     const payload = {
       pageno: 1
     }
@@ -136,12 +139,12 @@ export class Searchthefbike extends React.Component {
   }
 
   render() {
-    const { searchbike, loading } = this.props;
+    const { searchbike, loading, totalcount} = this.props;
     if (!(this.state.isLoading) && this.state.error) {
         return (
         <div className="row">
         <div className="col-xs-12">
-          <div className="alert alert-danger text-center">Error: Could not retrieve Bike Information at this time.</div>
+          <div className="alert alert-danger text-center">Oops, something went wrong.</div>
         </div>
       </div>
       );
@@ -166,7 +169,7 @@ export class Searchthefbike extends React.Component {
         </div>
       );
     }
-    const content = (searchbike.length === 0 ) ? 'NO ITEM FOUND, PLEASE TRY WITH DIFFERENT DATES !!!' : this.ReposList(loading, searchbike);
+    const content = (searchbike.length === 0 ) ? 'No Results' : this.ReposList(loading, searchbike);
     return (
       <article>
         <Helmet>
@@ -176,16 +179,18 @@ export class Searchthefbike extends React.Component {
             content="A React.js Boilerplate application homepage"
           />
         </Helmet>
-        <div>
+        
         <CenteredSection>
               <H2>
                 Police Department of Berlin
               </H2>
         </CenteredSection>
+        <div className="col-lg-2"><p>Total : {totalcount && totalcount.length}</p></div>
+        <div>
           <Section> 
-            <Form onSubmit={this.handleSubmit}>              
-                <div className="col-md-6">
-                  <Input name="searchs" type="text" className="input-lg" value={this.state.value} placeholder="Search Bike" onChange={this.handleChange} />
+            <Form onSubmit={this.handleSubmit} id="searchincidence">              
+                <div className="col-md-4">
+                  <Input name="searchs" type="text" className="input-lg" value={this.state.value} placeholder="Search case descriptions" onChange={this.handleChange} />
                 </div>
               <div className="col-md-2 text-control">
                   <DatePicker
@@ -205,9 +210,9 @@ export class Searchthefbike extends React.Component {
                     className="form-control"
                   />
               </div>
-              <div className="col-md-2">      
+              <div className="col-md-4">      
                   <button type="submit" value="Submit" className="btn btn-default" >Find Cases</button>
-                 {/* <button>Log In </button> */}
+                  <button type="button" onClick={this.reset} className="btn btn-default" >Clear</button> 
               </div>
             </Form>
             {content}
@@ -237,14 +242,6 @@ Searchthefbike.propTypes = {
 };
 
 export function mapDispatchToProps(dispatch) {
-  // return {
-  //   onChangeUsername: evt => dispatch(changeUsername(evt.target.value)),
-  //   getBenefits: evt => dispatch(getbikedetails())
-  //   // onSubmitForm: evt => {
-  //   //   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-  //   //   dispatch(loadRepos());
-  //   // },
-  // };
   return {
     actions: bindActionCreators(ActionCreators, dispatch),
     dispatch,
@@ -262,7 +259,7 @@ const intialState = {
 const mapStateToProps = createStructuredSelector({
   // repos: makeSelectRepos(),
   searchbike: makeSelectBike(),
-  // loading: makeSelectLoading(),
+  totalcount: makeSelecttotalCount(),
   showerror: makeSelectError(),
 });
 

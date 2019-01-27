@@ -1,5 +1,5 @@
 /*
- * Home Actions
+ * Case Details Actions
  *
  * Actions change things in your application
  * Since this boilerplate uses a uni-directional data flow, specifically redux,
@@ -15,7 +15,7 @@
  *    }
  */
 
-import { GET_BIKELIST, GET_BIKELISTS_SUCCESS, GET_BIKELISTS_FAIL, GET_CASECOUNT, GET_CASECOUNT_SUCCESS } from './constants';
+import { GET_CASEDETAILS_ID, GET_CASEDETAILS_ID_SUCCESS, GET_CASEDETAILS_ID_FAIL } from './constants';
 
 /**
  * Changes the input field of the form
@@ -25,32 +25,22 @@ import { GET_BIKELIST, GET_BIKELISTS_SUCCESS, GET_BIKELISTS_FAIL, GET_CASECOUNT,
  * @return {object}    An action object with a type of CHANGE_USERNAME
  */
 
-export function getcaseCount() {
+export function getcasedetailsById(Id) {
   return {
-    type: GET_CASECOUNT,
+    type: GET_CASEDETAILS_ID,
+    Id,
   };
 }
-export function getcasecountsuccess(response) {
+export function getcasedetailsByIdsuccess(casedetails) {
   return {
-    type: GET_CASECOUNT_SUCCESS,
-    response,
+    type: GET_CASEDETAILS_ID_SUCCESS,
+    casedetails,
   };
 }
-export function getbikedetails(payload) {
+
+export function getcasedetailsByIdFailure(showErrorMessage) {
   return {
-    type: GET_BIKELIST,
-    payload,
-  };
-}
-export function getbikedetailsSuccess(bikeResponse) {
-  return {
-    type: GET_BIKELISTS_SUCCESS,
-    bikeResponse,
-  };
-}
-export function getbikedetailsFailure(showErrorMessage) {
-  return {
-    type: GET_BIKELISTS_FAIL,
+    type: GET_CASEDETAILS_ID_FAIL,
     showErrorMessage,
   };
 }

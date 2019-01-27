@@ -3,11 +3,11 @@
  */
 
 import { call, put, select, takeLatest } from 'redux-saga/effects';
-import { GET_BIKELIST } from './constants';
-import { getbikedetailsSuccess, getbikedetailsFailure } from './actions';
+import { GET_BIKELIST, GET_CASECOUNT } from './constants';
+import { getbikedetailsSuccess, getbikedetailsFailure, getcasecountsuccess } from './actions';
 
 import request from 'utils/request';
-import { makeSelectPageNo, selectBike } from 'containers/Searchtheftbike/selectors';
+// import { makeSelectPageNo, selectBike } from 'containers/Searchtheftbike/selectors';
 
 /**
  * Github repos request/response handler
@@ -21,17 +21,27 @@ export function* getBikelist(action) {
   requestURL = (action.payload && action.payload.fromdatevalue) ? `${requestURL}&occurred_after=${action.payload.fromdatevalue}` : requestURL;
   requestURL = (action.payload && action.payload.toDatevalue) ? `${requestURL}&occurred_before=${action.payload.toDatevalue}` : requestURL;
 
-  const finalURL = `https://bikewise.org:443/api/v2/incidents?page=1&per_page=10&proximity_square=100&query=${action.payload.bikedesc}`;
+  // const finalURL = `https://bikewise.org:443/api/v2/incidents?page=1&per_page=10&proximity_square=100&query=${action.payload.bikedesc}`;
   try {
     // Call our request helper (see 'utils/request')
     const bikeresponse = yield call(request, requestURL);
-    // alert('saga inside');
     yield put(getbikedetailsSuccess(bikeresponse['incidents']));
   } catch (err) {
     yield put(getbikedetailsFailure('Failed'));
   }
 }
 
+export function* getcaseCount() {
+  let countURL = 'https://bikewise.org:443/api/v2/incidents';
+
+  try {
+     // Call our request helper (see 'utils/request')
+    const bikeresponse = yield call(request, countURL);
+    yield put(getcasecountsuccess(bikeresponse['incidents']));
+  } catch (err) {
+    yield put(getbikedetailsFailure('Failed'));
+  }
+}
 /**
  * Root saga manages watcher lifecycle
  */
@@ -40,5 +50,8 @@ export default function* fetchBikes() {
   // By using `takeLatest` only the result of the latest API call is applied.
   // It returns task descriptor (just like fork) so we can continue execution
   // It will be cancelled automatically on component unmount
-  yield takeLatest(GET_BIKELIST, getBikelist);
+  yield [
+    takeLatest(GET_BIKELIST, getBikelist),
+    takeLatest(GET_CASECOUNT, getcaseCount)
+  ]  
 }

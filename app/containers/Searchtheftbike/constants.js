@@ -12,5 +12,11 @@
 export const GET_BIKELIST = 'app/SearchBike/GET_BIKELIST';
 export const GET_BIKELISTS_SUCCESS = 'app/SearchBike/GET_BIKELISTS_SUCCESS';
 export const GET_BIKELISTS_FAIL = 'app/SearchBike/GET_BIKELISTS_FAIL';
+export const CLEAR_FILTER = 'app/SearchBike/CLEAR_FILTER';
+export const GET_CASECOUNT = 'app/SearchBike/GET_CASECOUNT';
+export const GET_CASECOUNT_SUCCESS = 'app/SearchBike/GET_CASECOUNT_SUCCESS';
+
+
+
 
 
