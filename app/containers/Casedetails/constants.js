@@ -1,0 +1,8 @@
+export const GET_CASEDETAILS_ID = 'app/SearchBike/GET_CASEDETAILS_ID';
+export const GET_CASEDETAILS_ID_SUCCESS = 'app/SearchBike/GET_CASEDETAILS_ID_SUCCESS';
+export const GET_CASEDETAILS_ID_FAIL = 'app/SearchBike/GET_CASEDETAILS_ID_FAIL';
+
+
+
+
+

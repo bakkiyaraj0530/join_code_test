@@ -11,7 +11,7 @@
  */
 import { fromJS } from 'immutable';
 
-import { GET_BIKELIST, GET_BIKELISTS_SUCCESS, GET_BIKELISTS_FAIL} from './constants';
+import { GET_BIKELIST, GET_BIKELISTS_SUCCESS, GET_BIKELISTS_FAIL, GET_CASECOUNT_SUCCESS } from './constants';
 
 // The initial state of the App
 export const initialState = fromJS({
@@ -30,6 +30,9 @@ function searchbikeReducer(state = initialState, action) {
     // return state.merge({
     //   bikelistResponse: action.bikeResponse,
     // });
+
+  case GET_CASECOUNT_SUCCESS: 
+   return state.set('response', action.response);
   case GET_BIKELISTS_FAIL:
      return state.set('showErrorMessage', action.showErrorMessage);
     // return state.merge({

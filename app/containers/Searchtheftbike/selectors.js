@@ -11,8 +11,11 @@ const makeSelectBike = () =>
   createSelector(selectBike, searchbikeState => searchbikeState.get('bikelistResponse'));
 const makeSelectError = () =>
   createSelector(selectBike, searchbikeState => searchbikeState.get('showErrorMessage'));
-  
+
+const makeSelecttotalCount = () =>
+  createSelector(selectBike, searchbikeState => searchbikeState.get('response'));
+
 const makeSelectPageNo = () =>
   createSelector(selectBike, searchbikeState => searchbikeState.get('payload'));
 
-export { selectBike, makeSelectBike, makeSelectPageNo, makeSelectError };
+export { selectBike, makeSelectBike, makeSelectPageNo, makeSelectError, makeSelecttotalCount };
