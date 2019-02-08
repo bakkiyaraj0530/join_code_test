@@ -15,7 +15,11 @@
  *    }
  */
 
-import { GET_CASEDETAILS_ID, GET_CASEDETAILS_ID_SUCCESS, GET_CASEDETAILS_ID_FAIL } from './constants';
+import {
+  GET_CASEDETAILS_ID,
+  GET_CASEDETAILS_ID_SUCCESS,
+  GET_CASEDETAILS_FAIL,
+} from './constants';
 
 /**
  * Changes the input field of the form
@@ -40,7 +44,7 @@ export function getcasedetailsByIdsuccess(casedetails) {
 
 export function getcasedetailsByIdFailure(showErrorMessage) {
   return {
-    type: GET_CASEDETAILS_ID_FAIL,
+    type: GET_CASEDETAILS_FAIL,
     showErrorMessage,
   };
 }

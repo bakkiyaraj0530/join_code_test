@@ -9,7 +9,7 @@ import history from 'utils/history';
 import globalReducer from 'containers/App/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import searchbikeReducer from 'containers/Searchtheftbike/reducer';
-
+import casedetailsReducer from 'containers/Casedetails/reducer';
 
 /**
  * Merges the main reducer with the router state and dynamically injected reducers
@@ -19,6 +19,7 @@ export default function createReducer(injectedReducers = {}) {
     global: globalReducer,
     language: languageProviderReducer,
     searchbike: searchbikeReducer,
+    casedetails: casedetailsReducer,
     ...injectedReducers,
   });
 
