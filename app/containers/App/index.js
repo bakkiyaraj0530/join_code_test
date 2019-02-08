@@ -11,7 +11,7 @@ import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { Switch, Route } from 'react-router-dom';
 
-import HomePage from 'containers/HomePage/Loadable';
+// import HomePage from 'containers/HomePage/Loadable';
 import Casedetails from 'containers/Casedetails/Loadable';
 import Searchthefbike from 'containers/Searchtheftbike/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
@@ -39,10 +39,10 @@ export default function App() {
       </Helmet>
       <Header />
       <Switch>
-        <Route exact path="/" component={HomePage} />
-        <Route path="/casedetails/:id" component={Casedetails} />
+        <Route exact path="/" component={Searchthefbike} />
+        <Route path="/casedetails/:id?" component={Casedetails} />
         <Route path="/searchbike" component={Searchthefbike} />
-        <Route path="" component={NotFoundPage} />        
+        <Route path="" component={NotFoundPage} />
       </Switch>
       {/* <Footer /> */}
       <GlobalStyle />
